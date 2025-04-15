@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import Bottle from "../Bottle/Bottle";
 import "./Bottles.css";
-import { addToLS } from "../../Utilities/localstorage";
+import { addToLS, getStoredCart } from "../../Utilities/localstorage";
 
 const Bottles = () => {
     const [bottles, setBottles] = useState([]);
@@ -14,15 +14,35 @@ const Bottles = () => {
         .then(data => setBottles(data))
     },[])
 
+    useEffect( () => {
+
+        if(bottles.length > 0) {
+            const storedCart = getStoredCart();
+
+            const savedCart = [];
+
+            for(const id of storedCart){
+                const bottle = bottles.find(bottle => bottle.id === id);
+            
+                if(bottle){
+                    savedCart.push(bottle);
+                }
+            }
+
+            setAddToCart(savedCart)
+
+        }
+
+    },[addToCart, bottles])
+
     const handleAddToCart = (item) => {
         if(addToCart.includes(item)){
             alert("The Item is Already added")
             return;
         }
-        const newAddToCart = [...addToCart, item]
-        setAddToCart(newAddToCart);
+        
 
-        addToLS(item);
+        addToLS(item.id);
         
     }
 
